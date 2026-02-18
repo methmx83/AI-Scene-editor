@@ -1,0 +1,56 @@
+:root {
+  font-family:
+    Inter,
+    Segoe UI,
+    sans-serif;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #111827;
+  color: #f3f4f6;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.subtitle {
+  color: #cbd5e1;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+button {
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #334155;
+}
+
+pre {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+  max-height: 320px;
+}
+
+.status {
+  margin-top: 16px;
+  color: #93c5fd;
+}
