@@ -1,20 +1,38 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { Project } from '@shared/types';
+import type { Asset, Project } from '@shared/types';
 
-export interface SaveLoadResult {
+export interface ProjectResponse {
   success: boolean;
   message: string;
   project?: Project;
 }
 
+export interface AssetImportResponse {
+  success: boolean;
+  message: string;
+  asset?: Asset;
+}
+
 contextBridge.exposeInMainWorld('projectApi', {
-  saveProject: async (project: Project): Promise<SaveLoadResult> => {
-    return ipcRenderer.invoke(
-      'project:save',
-      project,
-    ) as Promise<SaveLoadResult>;
+  newProject: async (): Promise<ProjectResponse> => {
+    return ipcRenderer.invoke('project:new') as Promise<ProjectResponse>;
   },
-  loadProject: async (): Promise<SaveLoadResult> => {
-    return ipcRenderer.invoke('project:load') as Promise<SaveLoadResult>;
+  saveProject: async (project: Project): Promise<ProjectResponse> => {
+    return ipcRenderer.invoke('project:save', project) as Promise<ProjectResponse>;
+  },
+  loadProject: async (): Promise<ProjectResponse> => {
+    return ipcRenderer.invoke('project:load') as Promise<ProjectResponse>;
+  },
+  importVideo: async (): Promise<AssetImportResponse> => {
+    return ipcRenderer.invoke('project:import-video') as Promise<AssetImportResponse>;
+  },
+  importImage: async (): Promise<AssetImportResponse> => {
+    return ipcRenderer.invoke('project:import-image') as Promise<AssetImportResponse>;
+  },
+  getProjectRoot: async (): Promise<string | null> => {
+    return ipcRenderer.invoke('project:get-root') as Promise<string | null>;
+  },
+  getAssetThumbnailDataUrl: async (relativePath: string): Promise<string | null> => {
+    return ipcRenderer.invoke('project:asset-thumbnail-data-url', relativePath) as Promise<string | null>;
   },
 });

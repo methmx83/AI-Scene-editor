@@ -1,8 +1,13 @@
 export interface Asset {
   id: string;
-  name: string;
-  type: 'image' | 'video' | 'audio' | 'unknown';
-  path: string;
+  type: 'image' | 'video';
+  originalName: string;
+  filePath: string;
+  thumbnailPath: string;
+  createdAt: string;
+  tags: string[];
+  notes: string;
+  status: 'idea' | 'generating' | 'review' | 'approved' | 'used';
 }
 
 export interface Clip {
@@ -32,8 +37,9 @@ export interface WorkflowRun {
 
 export interface Project {
   schemaVersion: number;
-  id: string;
+  projectId: string;
   name: string;
+  createdAt: string;
   assets: Asset[];
   timeline: Timeline;
   workflowDefinitions: WorkflowDefinition[];

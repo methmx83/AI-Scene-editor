@@ -5,8 +5,9 @@
   "type": "object",
   "required": [
     "schemaVersion",
-    "id",
+    "projectId",
     "name",
+    "createdAt",
     "assets",
     "timeline",
     "workflowDefinitions",
@@ -17,25 +18,50 @@
       "type": "integer",
       "const": 1
     },
-    "id": {
+    "projectId": {
       "type": "string"
     },
     "name": {
       "type": "string"
     },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
     "assets": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "name", "type", "path"],
+        "required": [
+          "id",
+          "type",
+          "originalName",
+          "filePath",
+          "thumbnailPath",
+          "createdAt",
+          "tags",
+          "notes",
+          "status"
+        ],
         "properties": {
           "id": { "type": "string" },
-          "name": { "type": "string" },
           "type": {
             "type": "string",
-            "enum": ["image", "video", "audio", "unknown"]
+            "enum": ["image", "video"]
           },
-          "path": { "type": "string" }
+          "originalName": { "type": "string" },
+          "filePath": { "type": "string" },
+          "thumbnailPath": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "notes": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["idea", "generating", "review", "approved", "used"]
+          }
         },
         "additionalProperties": false
       }
