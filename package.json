@@ -16,5 +16,8 @@
   },
   "devDependencies": {
     "prettier": "^3.4.2"
+  },
+  "dependencies": {
+    "ajv-formats": "^3.0.1"
   }
 }

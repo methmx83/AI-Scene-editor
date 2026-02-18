@@ -1,11 +1,12 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import Ajv from 'ajv';
+import Ajv2020 from "ajv/dist/2020.js";
 import type { Project } from '@shared/types';
 import projectSchema from '../../../../packages/shared/project.schema.json';
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+ajv.addFormat("date-time", true);
 const validateProject = ajv.compile<Project>(projectSchema);
 
 function createWindow(): void {
