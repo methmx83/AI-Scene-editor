@@ -28,6 +28,92 @@ interface AssetImportResponse {
   asset?: Asset;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+export function migrateProjectToV2(project: unknown): unknown {
+  if (!isRecord(project)) {
+    return project;
+  }
+
+  const schemaVersion = project.schemaVersion;
+  if (schemaVersion === 2) {
+    return project;
+  }
+
+  if (schemaVersion !== 1) {
+    return project;
+  }
+
+  const timeline = isRecord(project.timeline) ? project.timeline : null;
+  const oldClips = Array.isArray(timeline?.clips) ? timeline.clips : [];
+  const migratedClips = oldClips.map((clip) => {
+    if (!isRecord(clip)) {
+      return clip;
+    }
+    return {
+      ...clip,
+      offset: 0,
+    };
+  });
+
+  return {
+    ...project,
+    schemaVersion: 2,
+    timeline: {
+      tracks: [
+        {
+          id: 'track_video_1',
+          kind: 'video',
+          name: 'Video Track',
+          clips: migratedClips,
+        },
+      ],
+    },
+  };
+}
+
+function runMigrationSanityCheck(): void {
+  const v1Project: unknown = {
+    schemaVersion: 1,
+    timeline: {
+      clips: [
+        {
+          id: 'clip-1',
+          assetId: 'asset-1',
+          start: 0,
+          duration: 4,
+        },
+      ],
+    },
+  };
+
+  const migrated = migrateProjectToV2(v1Project);
+  if (!isRecord(migrated) || migrated.schemaVersion !== 2) {
+    throw new Error('Migration sanity check failed: schemaVersion was not migrated to 2.');
+  }
+
+  const timeline = migrated.timeline;
+  if (!isRecord(timeline) || !Array.isArray(timeline.tracks) || timeline.tracks.length !== 1) {
+    throw new Error('Migration sanity check failed: timeline.tracks was not created.');
+  }
+
+  const firstTrack = timeline.tracks[0];
+  if (!isRecord(firstTrack) || firstTrack.id !== 'track_video_1' || firstTrack.kind !== 'video') {
+    throw new Error('Migration sanity check failed: default track is invalid.');
+  }
+
+  if (!Array.isArray(firstTrack.clips)) {
+    throw new Error('Migration sanity check failed: default track clips are missing.');
+  }
+
+  const firstClip = firstTrack.clips[0];
+  if (!isRecord(firstClip) || firstClip.offset !== 0) {
+    throw new Error('Migration sanity check failed: clip offset was not added.');
+  }
+}
+
 function resolveProjectPath(projectRoot: string, relativePath: string): string {
   return path.join(projectRoot, relativePath);
 }
@@ -50,12 +136,12 @@ function createWindow(): void {
 
 function createEmptyProject(projectName: string): Project {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     projectId: randomUUID(),
     name: projectName,
     createdAt: new Date().toISOString(),
     assets: [],
-    timeline: { clips: [] },
+    timeline: { tracks: [] },
     workflowDefinitions: [],
     workflowRuns: [],
   };
@@ -268,14 +354,17 @@ ipcMain.handle('project:load', async (): Promise<ProjectResponse> => {
   }
 
   const content = await fs.readFile(projectPath, 'utf-8');
-  const data = JSON.parse(content) as Project;
+  const parsed = JSON.parse(content) as unknown;
+  const migrated = migrateProjectToV2(parsed);
 
-  if (!validateProject(data)) {
+  if (!validateProject(migrated)) {
     return {
       success: false,
       message: `Loaded file is invalid: ${ajv.errorsText(validateProject.errors)}`,
     };
   }
+
+  const project: Project = migrated;
 
   currentProjectRoot = path.dirname(projectPath);
   await ensureProjectStructure(currentProjectRoot);
@@ -283,7 +372,7 @@ ipcMain.handle('project:load', async (): Promise<ProjectResponse> => {
   return {
     success: true,
     message: `Loaded from ${projectPath}`,
-    project: data,
+    project,
   };
 });
 
@@ -317,6 +406,10 @@ ipcMain.handle('project:asset-thumbnail-data-url', async (_event, relativePath: 
 });
 
 app.whenReady().then(() => {
+  if (process.env.AI_SCENE_EDITOR_RUN_MIGRATION_SANITY === '1') {
+    runMigrationSanityCheck();
+  }
+
   createWindow();
 
   app.on('activate', () => {

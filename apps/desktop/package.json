@@ -8,7 +8,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "typecheck": "tsc -b tsconfig.node.json tsconfig.web.json --pretty false",
     "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {

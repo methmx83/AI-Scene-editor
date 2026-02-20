@@ -8,7 +8,7 @@ function emptyProject(): Project {
     name: 'No Project Loaded',
     createdAt: new Date(0).toISOString(),
     assets: [],
-    timeline: { clips: [] },
+    timeline: { tracks: [] },
     workflowDefinitions: [],
     workflowRuns: [],
   };

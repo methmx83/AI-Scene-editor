@@ -108,7 +108,7 @@ export default function ComfyPanel() {
                   onClick={(e) => {
                     e.stopPropagation();
                     setWorkflows((prev) => prev.filter((x) => x.id !== wf.id));
-                    if (selectedId === wf.id) setSelectedId(prev[0]?.id ?? "");
+                    if (selectedId === wf.id) setSelectedId(workflows[0]?.id ?? "");
                   }}
                   className="opacity-0 group-hover:opacity-100 p-2 hover:text-red-500 transition-all"
                   title="Remove (UI-only)"

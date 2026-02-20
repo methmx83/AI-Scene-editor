@@ -8,5 +8,8 @@
     "src/main/**/*.ts",
     "src/preload/**/*.ts",
     "electron.vite.config.ts"
+  ],
+  "references": [
+    { "path": "../../packages/shared" }
   ]
 }
