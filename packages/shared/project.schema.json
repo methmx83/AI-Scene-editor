@@ -16,7 +16,9 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 1
+      "const": 2,
+      "default": 2,
+      "examples": [2]
     },
     "projectId": {
       "type": "string"
@@ -68,18 +70,35 @@
     },
     "timeline": {
       "type": "object",
-      "required": ["clips"],
+      "required": ["tracks"],
       "properties": {
-        "clips": {
+        "tracks": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["id", "assetId", "start", "duration"],
+            "required": ["id", "kind", "name", "clips"],
             "properties": {
               "id": { "type": "string" },
-              "assetId": { "type": "string" },
-              "start": { "type": "number" },
-              "duration": { "type": "number" }
+              "kind": {
+                "type": "string",
+                "enum": ["video", "overlay", "audio", "text"]
+              },
+              "name": { "type": "string" },
+              "clips": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "assetId", "start", "duration", "offset"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "assetId": { "type": "string" },
+                    "start": { "type": "number" },
+                    "duration": { "type": "number" },
+                    "offset": { "type": "number" }
+                  },
+                  "additionalProperties": false
+                }
+              }
             },
             "additionalProperties": false
           }

@@ -15,10 +15,18 @@ export interface Clip {
   assetId: string;
   start: number;
   duration: number;
+  offset: number;
+}
+
+export interface Track {
+  id: string;
+  kind: 'video' | 'overlay' | 'audio' | 'text';
+  name: string;
+  clips: Clip[];
 }
 
 export interface Timeline {
-  clips: Clip[];
+  tracks: Track[];
 }
 
 export interface WorkflowDefinition {
